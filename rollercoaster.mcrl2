@@ -42,7 +42,7 @@ act
     switch_allow_forward, switch_allow_backward, gate_allow_forward,
     gate_allow_backward, button_allow_forward: Cart_Id # Segment # Segment;
     gates_close, gates_open, allow_gates_open, switch_allow_gates_open, allow_gates_close, station_close_gates, station_open_gates;
-    switch_up, switch_down, allow_switch_up, allow_switch_down, station_switch_up, station_switch_down;
+    switch_up, switch_down, track_allow_switch_up, track_allow_switch_down, station_switch_up, station_switch_down;
     cart_open_braces, allow_open_braces, open_braces, button_detect_open_braces,
     cart_close_braces, set_braces_closed, button_confirm_braces_closed: Cart_Id;
     push_button;
@@ -86,7 +86,7 @@ proc Track(c1:Segment, c2:Segment) =
     +
     (c2 == station && c1 != repair) -> allow_backward(cart2_id, station, repair) . Track(c1, repair)
     +
-    ((c1 == braking && (c2 == repair || c2 == station)) || (c2 == braking && (c1 == repair || c1 == station))) -> (allow_switch_up + allow_switch_down) . Track(c1, c2)
+    ((c1 == braking && (c2 == repair || c2 == station)) || (c2 == braking && (c1 == repair || c1 == station))) -> (track_allow_switch_up + track_allow_switch_down) . Track(c1, c2)
     +
     (c1 == station || c2 == station) -> (allow_gates_open + allow_gates_close) . Track(c1, c2)
     +
@@ -164,8 +164,8 @@ init allow(
             cart_backward | allow_backward | switch_allow_backward | gate_allow_backward -> backward,
             allow_gates_close | gates_close -> station_close_gates,
             allow_gates_open | switch_allow_gates_open | gates_open -> station_open_gates,
-            allow_switch_up | switch_up -> station_switch_up,
-            allow_switch_down | switch_down -> station_switch_down,
+            track_allow_switch_up | switch_up -> station_switch_up,
+            track_allow_switch_down | switch_down -> station_switch_down,
             allow_open_braces | cart_open_braces | button_detect_open_braces -> open_braces,
             cart_close_braces | button_confirm_braces_closed -> set_braces_closed
         },
