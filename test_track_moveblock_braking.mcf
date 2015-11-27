@@ -9,11 +9,11 @@ forall id_x, id_y:Cart_Id . val(id_x != id_y) => [ true* . (
         forward(id_y, repair, station)
         +
         forward(id_y, braking, station)
-    ) . !(
+    ) . (!(
         forward(id_y, station, lift)
-        +
+        ||
         backward(id_y, station, repair)
-    )* . forward(id_x, main, braking)
+    )*) . forward(id_x, main, braking)
     
     % now Y should be in the station, so X should not be able to enter the station.
 ) . forward(id_x, braking, station)] false

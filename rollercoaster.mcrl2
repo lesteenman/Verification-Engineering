@@ -106,15 +106,15 @@ proc Gate(open:Bool) =
             +
             sum cart_id: Cart_Id . sum to: Segment . (
                 gate_allow_forward(cart_id, station, to) + gate_allow_backward(cart_id, station, to)
-                ) . Gate(open)
+                ) . Gate()
             +
-            gate_allow_push_left_button
+            gate_allow_push_left_button . Gate()
             +
-            gate_allow_push_right_button
+            gate_allow_push_right_button . Gate()
         )
     +
     sum cart_id: Cart_Id . sum from, to: Segment . (from != station) ->
-        (gate_allow_forward(cart_id, from, to) + gate_allow_backward(cart_id, from, to)) . Gate(open);
+        (gate_allow_forward(cart_id, from, to) + gate_allow_backward(cart_id, from, to)) . Gate();
 
 % Switch Process
 proc Switch(pos:SwitchPos) =

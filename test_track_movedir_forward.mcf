@@ -1,0 +1,7 @@
+
+
+forall from, to: Segment . val(
+    !(
+        (from == station && to == lift) || (from == lift && to == main) || (from == main && to == braking) || (from == braking && to == station)
+    )
+) => [ true* . forward(from, to) ] false
