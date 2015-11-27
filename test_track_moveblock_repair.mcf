@@ -1,0 +1,3 @@
+% Any cart X that's in the repair area can't move forward if the other cart (Y) is not in the braking area.
+
+forall id_x, id_y: Cart_Id . val(id_x != id_y) => [ true* . forward(id_y, braking, station) . (!forward(id_y, main, braking))* . forward(id_x, repair, station) ] false

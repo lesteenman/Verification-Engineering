@@ -1,0 +1,3 @@
+% The repair area is reachable for all carts from each position
+
+forall id:Cart_Id . [true*] <true* . backward(id, station, repair)> true

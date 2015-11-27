@@ -1,0 +1,4 @@
+% The track will not allow any cart X to move backward if cart X is not in the station
+
+% Note: Takes a *long* time.
+forall id:Cart_Id . forall from, to:Segment . val(from != station) => [ true* . backward(id, from, to) ] false
