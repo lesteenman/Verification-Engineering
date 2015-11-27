@@ -31,6 +31,7 @@ eqn
     (s1 == main) -> is_blocked(s1, s2) = false; % main track area can't block
 
 sort Cart_Id = struct cart1_id | cart2_id;
+sort Button_Id = struct left_button | right_button;
 sort SwitchPos = struct up | down;
 
 %%
@@ -40,13 +41,13 @@ sort SwitchPos = struct up | down;
 act
     cart_forward, cart_backward, allow_forward, allow_backward, forward, backward,
     switch_allow_forward, switch_allow_backward, gate_allow_forward,
-    gate_allow_backward, button_allow_forward: Cart_Id # Segment # Segment;
+    gate_allow_backward, button_right_allow_forward, button_left_allow_forward, button_allow_forward: Cart_Id # Segment # Segment;
     gates_close, gates_open, allow_gates_open, switch_allow_gates_open, allow_gates_close, station_close_gates, station_open_gates;
     switch_up, switch_down, allow_switch_up, allow_switch_down, station_switch_up, station_switch_down;
-    cart_open_braces, allow_open_braces, open_braces, button_detect_open_braces,
-    cart_close_braces, set_braces_closed, button_confirm_braces_closed: Cart_Id;
-    push_button;
-
+    cart_open_braces, allow_open_braces, open_braces, button_right_braces_open, button_left_braces_open, button_braces_open,
+    cart_close_braces, set_braces_closed, button_right_braces_closed, button_left_braces_closed, button_braces_closed: Cart_Id;
+    push_button: Button_Id;
+    push_left_button, push_right_button, station_push_left_button, station_push_right_button, gate_allow_push_left_button, gate_allow_push_right_button;
 
 %%
 % ProcessesThe switch will not allow the gates to be opened if the switch is up
@@ -107,6 +108,10 @@ proc Gate(open:Bool) =
             sum cart_id: Cart_Id . sum to: Segment . (
                 gate_allow_forward(cart_id, station, to) + gate_allow_backward(cart_id, station, to)
                 ) . Gate(open)
+            +
+            gate_allow_push_left_button
+            +
+            gate_allow_push_right_button
         )
     +
     sum cart_id: Cart_Id . sum from, to: Segment . (from != station) ->
@@ -137,38 +142,54 @@ proc Switch(pos:SwitchPos) =
     +
     (pos == down) -> switch_allow_gates_open . Switch(pos);
 
-% Button
-proc Button(open:Bool) =
-    (!open) -> sum cart_id:Cart_Id . button_detect_open_braces(cart_id) . Button(true)
+% Buttons
+proc Button(id:Button_Id, open:Bool) =
+    (!open) -> sum cart_id:Cart_Id . button_braces_open(cart_id) . Button(id, true)
     +
-    (open) -> push_button . Button(false)
+    (open) -> push_button(id) . Button(id, false)
     +
     (!open) -> sum cart_id:Cart_Id . (
-        sum to:Segment . button_allow_forward(cart_id, station, to) . Button()
+        sum to:Segment . button_allow_forward(cart_id, station, to) . Button(id, open)
         +
-        button_confirm_braces_closed(cart_id) . Button()
+        button_braces_closed(cart_id) . Button(id, open)
     )
     +
-    sum from, to: Segment . sum cart_id:Cart_Id . (from != station) -> button_allow_forward(cart_id, from, to) . Button();
+    sum from, to: Segment . sum cart_id:Cart_Id . (from != station) -> button_allow_forward(cart_id, from, to) . Button(id, open);
+
+proc Left_Button(open: Bool) = rename({
+    push_button -> push_left_button,
+    button_allow_forward -> button_left_allow_forward,
+    button_braces_closed -> button_left_braces_closed,
+    button_braces_open -> button_left_braces_open
+}, Button(left_button, open));
+
+proc Right_Button(open: Bool) = rename({
+    push_button -> push_right_button,
+    button_allow_forward -> button_right_allow_forward,
+    button_braces_closed -> button_right_braces_closed,
+    button_braces_open -> button_right_braces_open
+}, Button(right_button, open));
 
 %%
 % Init
 %%
 init allow(
     { 
-        forward, backward, station_switch_up, station_switch_down, station_close_gates, station_open_gates, open_braces, push_button, set_braces_closed
+        forward, backward, station_switch_up, station_switch_down, station_close_gates, station_open_gates, open_braces, station_push_right_button, station_push_left_button, set_braces_closed
     },
     comm (
         {
-            cart_forward | allow_forward | switch_allow_forward | gate_allow_forward | button_allow_forward -> forward,
+            cart_forward | allow_forward | switch_allow_forward | gate_allow_forward | button_right_allow_forward | button_left_allow_forward -> forward,
             cart_backward | allow_backward | switch_allow_backward | gate_allow_backward -> backward,
             allow_gates_close | gates_close -> station_close_gates,
             allow_gates_open | switch_allow_gates_open | gates_open -> station_open_gates,
             allow_switch_up | switch_up -> station_switch_up,
             allow_switch_down | switch_down -> station_switch_down,
-            allow_open_braces | cart_open_braces | button_detect_open_braces -> open_braces,
-            cart_close_braces | button_confirm_braces_closed -> set_braces_closed
+            allow_open_braces | cart_open_braces | button_braces_open -> open_braces,
+            cart_close_braces | button_right_braces_closed | button_left_braces_closed -> set_braces_closed,
+            push_left_button | gate_allow_push_left_button -> station_push_left_button,
+            push_right_button | gate_allow_push_right_button -> station_push_right_button
         },
         Cart(cart1_id, cart1_start, false) || Cart(cart2_id, cart2_start, false) || Track(cart1_start, cart2_start) ||
-        Switch(down) || Gate(false) || Button(false)
+        Switch(down) || Gate(false) || Left_Button(false) || Right_Button(false)
     ));
