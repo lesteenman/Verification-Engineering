@@ -1,8 +1,0 @@
-% The cart can not open the security braces outside of the station
-
-forall id:Cart_Id .
-    [true* . (
-        (forward(id, station, lift) . (!forward(id, braking, station))*)
-        +
-        (backward(id, station, repair) . (!forward(id, repair, station))*)
-    ) . open_braces(id)] false

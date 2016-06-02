@@ -1,0 +1,8 @@
+% The gates will be closed before a cart is moving either forward or backward from the station
+
+forall id:Cart_Id . [ true* . station_open_gates . (!station_close_gates)* . (
+        forward(id, station, lift)
+        +
+        backward(id, station, repair)
+    )
+] false

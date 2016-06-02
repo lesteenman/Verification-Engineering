@@ -1,3 +1,0 @@
-% The switch will not allow a cart to move from braking to station if the switch is up
-
-forall id: Cart_Id . [ true* . station_switch_up . (!station_switch_down)* .  forward(id, braking, station) ] false

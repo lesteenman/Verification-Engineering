@@ -1,0 +1,4 @@
+% The track is fully traversable from station to station for all carts
+% Stronger: From each position, there exists a path that traverses the full track ([true*] added)
+
+forall id:Cart_Id . [true*] <true* . forward(id, braking, station) . true* . forward(id, braking, station)> true

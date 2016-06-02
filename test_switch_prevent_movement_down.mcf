@@ -1,7 +1,0 @@
-% The switch will not allow a cart to move from repair to station or station to repair if the switch is down
-
-forall id: Cart_Id . [true* . station_switch_down . (!station_switch_up)* . (
-    forward(id, repair, station)
-    +
-    backward(id, station, repair)
-)] false

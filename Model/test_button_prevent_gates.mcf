@@ -1,0 +1,13 @@
+% The button will not allow the gates to be opened if the button is pressed.
+
+forall id: Cart_Id . [
+    true* . (
+        forward(id, braking, station)
+        +
+        forward(id, repair, station)
+    ) . open_braces(id) . push_button . (!(
+        forward(id, station, lift)
+        ||
+        backward(id, station, repair)
+    ))* . station_open_gates
+] false

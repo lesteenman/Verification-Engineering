@@ -41,7 +41,7 @@ act
     cart_forward, cart_backward, track_allow_forward, allow_backward, forward, backward,
     switch_allow_forward, switch_allow_backward, gate_allow_forward,
     gate_allow_backward, button_allow_forward: Cart_Id # Segment # Segment;
-    gates_close, gates_open, track_allow_gates_open, switch_allow_gates_open, track_allow_gates_close, station_close_gates, station_open_gates;
+    gates_close, gates_open, track_allow_gates_open, switch_allow_gates_open, button_allow_gates_open, track_allow_gates_close, station_close_gates, station_open_gates;
     switch_up, switch_down, track_allow_switch_up, track_allow_switch_down, station_switch_up, station_switch_down;
     cart_open_braces, track_allow_open_braces, open_braces, button_detect_open_braces,
     cart_close_braces, set_braces_closed, button_confirm_braces_closed: Cart_Id;
@@ -53,25 +53,25 @@ act
 %%
 
 % Cart Process
-proc Cart(id:Cart_Id, pos:Segment, open:Bool) =
+proc Cart(id:Cart_Id, pos:Segment, open:Bool, locked:Bool) =
     (!open && pos == station) ->
         (
-            cart_forward(id, station, lift) . Cart(id, lift, open)
+            cart_forward(id, station, lift) . Cart(pos=lift)
             +
-            cart_backward(id, station, repair) . Cart(id, repair, open)
+            cart_backward(id, station, repair) . Cart(pos=repair)
         )
     +
-    (!open && pos == lift) -> cart_forward(id, lift, main) . Cart(id, main, open)
+    (!open && pos == lift) -> cart_forward(id, lift, main) . Cart(pos=main)
     +
-    (!open && pos == main) -> cart_forward(id, main, braking) . Cart(id, braking, open)
+    (!open && pos == main) -> cart_forward(id, main, braking) . Cart(pos=braking)
     +
-    (!open && pos == braking) -> cart_forward(id, braking, station) . Cart(id, station, open)
+    (!open && pos == braking) -> cart_forward(id, braking, station) . Cart(pos=station, locked=false)
     +
-    (!open && pos == repair) -> cart_forward(id, repair, station) . Cart(id, station, open)
+    (!open && pos == repair) -> cart_forward(id, repair, station) . Cart(pos=station, locked=false)
     +
-    (!open) -> cart_open_braces(id) . Cart(id, pos, true)
+    (!open && !locked) -> cart_open_braces(id) . Cart(open=true)
     +
-    (open) -> cart_close_braces(id) . Cart(id, pos, false);
+    (open) -> cart_close_braces(id) . Cart(open=false, locked=true);
 
 % Track Process
 proc Track(c1:Segment, c2:Segment) = 
@@ -149,6 +149,8 @@ proc Button(open:Bool) =
         button_confirm_braces_closed(cart_id) . Button()
     )
     +
+    (open) -> button_allow_gates_open . Button()
+    +
     sum from, to: Segment . sum cart_id:Cart_Id . (from != station) -> button_allow_forward(cart_id, from, to) . Button();
 
 %%
@@ -163,12 +165,12 @@ init allow(
             cart_forward | track_allow_forward | switch_allow_forward | gate_allow_forward | button_allow_forward -> forward,
             cart_backward | allow_backward | switch_allow_backward | gate_allow_backward -> backward,
             track_allow_gates_close | gates_close -> station_close_gates,
-            track_allow_gates_open | switch_allow_gates_open | gates_open -> station_open_gates,
+            track_allow_gates_open | switch_allow_gates_open | button_allow_gates_open | gates_open -> station_open_gates,
             track_allow_switch_up | switch_up -> station_switch_up,
             track_allow_switch_down | switch_down -> station_switch_down,
             track_allow_open_braces | cart_open_braces | button_detect_open_braces -> open_braces,
             cart_close_braces | button_confirm_braces_closed -> set_braces_closed
         },
-        Cart(cart1_id, cart1_start, false) || Cart(cart2_id, cart2_start, false) || Track(cart1_start, cart2_start) ||
+        Cart(cart1_id, cart1_start, false, true) || Cart(cart2_id, cart2_start, false, true) || Track(cart1_start, cart2_start) ||
         Switch(down) || Gate(false) || Button(false)
     ));

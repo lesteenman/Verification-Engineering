@@ -1,3 +1,0 @@
-% The switch will not allow the gates to be opened if the switch is up
-
-[ true* . station_switch_up . (!station_switch_down)* . station_open_gates ] false

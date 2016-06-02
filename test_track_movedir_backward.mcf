@@ -1,8 +1,0 @@
-% The track will only allow a cart to move backward from the station to the repair area.
-
-% Note: Takes a *long* time.
-forall id:Cart_Id . forall from, to: Segment . val(
-    !(from == station && to == repair)
-) => [ true* . (
-    backward(id, from, to) 
-)] false

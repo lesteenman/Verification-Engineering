@@ -1,0 +1,107 @@
+program: java -cp "D:/GDrive/Studie/VE/Code/Project/Program" Rollercoaster.ConsoleProgram
+input: push_button station_switch_up station_switch_down station_open_gates station_close_gates
+output: forward backward open_braces set_braces_closed
+timeout: 8s
+
+Fails:
+1 output(out:for): forward!cart1_id!braking!station
+2 output(out:ope): open_braces!cart1_id
+3 output(out): (Quiescence)
+4 input(in:pus): push_button
+5 output(out:set): set_braces_closed!cart1_id
+6 output(out:for): forward!cart1_id!station!lift
+7 output(out:for): forward!cart1_id!lift!main
+8 output(out:for): forward!cart1_id!main!braking
+9 input(in:sta): station_switch_up
+10 output(out:for): forward!cart2_id!repair!station
+11 input(in:sta): station_switch_down
+12 output(out:ope): open_braces!cart2_id
+13 output(out): (Quiescence)
+14 input(in:sta): station_switch_up
+15 output(out:bac): backward!cart2_id!station!repair
+
+Error: 
+2016-01-05T08:37:53.688+0100 STATS 15 #states 0
+2016-01-05T08:37:53.688+0100 ABSTRACT 15 backward!cart2_id!station!repair
+2016-01-05T08:37:53.688+0100 CONCRETE 15 backward!cart2_id!station!repair
+2016-01-05T08:37:53.688+0100 STATEID 15 fail
+2016-01-05T08:37:53.688+0100 STATELABEL 15 fail
+2016-01-05T08:37:53.688+0100 NODENAME 15 (failstate)
+2016-01-05T08:37:53.688+0100 EDGENAME 15 null
+2016-01-05T08:37:53.688+0100 TIMESTAMP 15 22402000
+2016-01-05T08:37:53.688+0100 KIND 15 OUTPUT
+2016-01-05T08:37:53.719+0100 LOG 15 (StdInOut-Adapter) in done: running=f cleanedUp=f
+2016-01-05T08:37:53.720+0100 VERDICT 15 fail
+2016-01-05T08:37:53.720+0100 EXPECTED 15 delta
+2016-01-05T08:37:53.720+0100 EOT 15
+
+Note: Setting the 2nd car on the track and immediately switching the track back up does not work, since the braces don't close before cart 2 drives backward.
+
+
+
+Fails:
+1 output(out:for): forward!cart1_id!braking!station
+2 input(in:sta): station_open_gates
+....
+23 output(out:for): forward!cart1_id!main!braking
+24 input(in:sta): station_switch_up
+25 input(in:sta): station_switch_down
+26 input(in:sta): station_switch_up
+27 output(out:for): forward!cart2_id!repair!station
+28 output(out:for): forward!cart2_id!station!station
+
+Note: Clearly wrong.
+
+
+
+Fails:
+1 output(out:for): forward!cart1_id!braking!station
+...
+6 input(in:pus): push_button
+7 output(out:set): set_braces_closed!cart1_id
+8 input(in:sta): station_close_gates
+9 input(in:sta): station_open_gates
+10 output(out): (Quiescence)
+
+Note: Disallow opening gates after braces have been closed in model.
+
+
+Fails:
+1 output(out:for): forward!cart1_id!braking!station
+2 output(out:ope): open_braces!cart1_id
+3 input(in:pus): push_button
+4 output(out:set): set_braces_closed!cart1_id
+5 output(out:for): forward!cart1_id!station!lift
+6 output(out:for): forward!cart1_id!lift!main
+7 output(out:for): forward!cart1_id!main!braking
+8 output(out): (Quiescence)
+
+Log:
+2016-01-05T08:51:45.954+0100 STATS 8 #states 0
+2016-01-05T08:51:45.954+0100 ABSTRACT 8 delta
+2016-01-05T08:51:45.954+0100 STATEID 8 fail
+2016-01-05T08:51:45.954+0100 STATELABEL 8 fail
+2016-01-05T08:51:45.954+0100 NODENAME 8 (failstate)
+2016-01-05T08:51:45.954+0100 EDGENAME 8 null
+2016-01-05T08:51:45.954+0100 TIMESTAMP 8 13161410
+2016-01-05T08:51:45.954+0100 KIND 8 OUTPUT
+2016-01-05T08:51:46.979+0100 LOG 8 (StdInOut-Adapter) in done: running=f cleanedUp=f
+2016-01-05T08:51:46.979+0100 VERDICT 8 fail
+2016-01-05T08:51:46.979+0100 EXPECTED 8 forward!cart1_id!braking!station
+2016-01-05T08:51:46.979+0100 EOT 8
+
+Note: Fix by setting timeout to 9 seconds
+
+
+Fails:
+1 output(out:for): forward!cart1_id!braking!station
+...
+14 output(out:for): forward!cart1_id!main!braking
+15 input(in:sta): station_switch_up
+16 input(in:sta): station_switch_down
+17 output(out:for): forward!cart2_id!repair!station
+
+Note: Disallow station_switch_down until cart2 has moved forward in model.
+
+
+Note: Check for possibility to track coverage information, possibly between runs.

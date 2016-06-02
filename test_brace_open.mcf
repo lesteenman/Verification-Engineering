@@ -1,4 +1,0 @@
-% The cart can open the security braces. The 'inside the station' follows from the 
-% validity of test 'test_braces_no_open'.
-
-forall id:Cart_Id . <true* . open_braces(id)>  true

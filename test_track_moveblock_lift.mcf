@@ -1,3 +1,0 @@
-% Any cart X that's on the lift can't move forward if the other cart (Y) is not in the repair area or station.
-
-forall id_x, id_y: Cart_Id . [ val(id_x != id_y) . forward(id_y, station, lift) . (!forward(id_y, braking, station))* . forward(id_x, lift, main) ] false

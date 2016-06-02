@@ -1,0 +1,3 @@
+% There exists a path where the gates can open and close again.
+
+<true* . station_open_gates . true* . station_close_gates > true

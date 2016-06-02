@@ -1,0 +1,38 @@
+ADAPTERKIND STDINOUTADAPTER
+ADDRMLABELANNO false
+ADDRMLABELANNOPREFIX false
+ADDRMLABELANNOSUFFIX false
+ANGELCOMPL false
+COPYDIVSTATES false
+DIVERGENCE false
+GUIDEKIND 
+GUIDETEXT 
+IMPLKIND model
+IMPLTEXT java -cp "D:/GDrive/Studie/VE/Code/Project/Program" Rollercoaster.ConsoleProgram
+INSTIMPLTEXT 
+INSTMODELTEXT 
+INTERPINPUTS push_button station_switch_up station_switch_down station_open_gates station_close_gates
+INTERPKIND ACTIONLIST
+INTERPOUTPUTS forward backward open_braces set_braces_closed
+MODELKIND model
+MODELTEXT D:\GDrive\Studie\VE\Code\Project\Model\output.aut
+RECONDELTA false
+SEED 12894412
+SIMSEED 
+SYNTHDELTA true
+TIMEOUTUNIT SECONDS
+TIMEOUTVAL 12
+TRACEKIND STRACES
+USECOVERAGE true
+USEGUIDE false
+USEIMPLINST false
+USEMODELINST false
+USEREALTIME false
+VIZCOVERAGE true
+VIZGUIDE true
+VIZIMPL true
+VIZLOG true
+VIZMODEL true
+VIZMSC true
+VIZRUN true
+VIZSA false

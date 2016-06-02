@@ -1,0 +1,3 @@
+% The track will prevent any cart X from moving backward if cart Y is not in the braking area
+
+forall id_x, id_y: Cart_Id . [ val(id_x != id_y) . true* . forward(id_y, station, lift) . (!forward(id_y, main, braking))* . backward(id_x, station, repair)] false
